@@ -9,6 +9,8 @@ import sys, csv
 class Window (QWidget):
     def __init__ (self):
         QWidget.__init__(self, None)
+
+
         self.setWindowTitle('Test')
 
 class View (Window):
@@ -16,75 +18,104 @@ class View (Window):
         super(View, self).__init__()
         self.resize(700, 700)
 
-        #サイズ固定
-        # self.setFixedSize(850, 500)
+
+
+
+        self.frame = QFrame()
+        # self.frame.setGeometry(QRect(90, 20, 771, 561))
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.verticalLayoutWidget = QWidget(self.frame)
+        # self.verticalLayoutWidget.setGeometry(QRect(30, 30, 701, 501))
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+        self.verticalLayout_all = QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout_all.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_all.setObjectName("verticalLayout_all")
+        self.horizontalLayout_ctrltable = QHBoxLayout()
+        self.horizontalLayout_ctrltable.setObjectName("horizontalLayout_ctrltable")
+        self.verticalLayout_ctrl = QVBoxLayout()
+        self.verticalLayout_ctrl.setObjectName("verticalLayout_ctrl")
+        self.horizontalLayout_com = QHBoxLayout()
+        self.horizontalLayout_com.setObjectName("horizontalLayout_com")
+        self.comboBox_COM = QComboBox(self.verticalLayoutWidget)
+        self.comboBox_COM.setObjectName("comboBox_COM")
+        self.horizontalLayout_com.addWidget(self.comboBox_COM)
+        self.pushButton_COM = QPushButton(self.verticalLayoutWidget)
+        self.pushButton_COM.setObjectName("pushButton_COM")
+        self.horizontalLayout_com.addWidget(self.pushButton_COM)
+        self.verticalLayout_ctrl.addLayout(self.horizontalLayout_com)
+        self.label_status = QLabel(self.verticalLayoutWidget)
+        self.label_status.setObjectName("label_status")
+        self.verticalLayout_ctrl.addWidget(self.label_status)
+        self.label_data = QLabel(self.verticalLayoutWidget)
+        self.label_data.setObjectName("label_data")
+        self.verticalLayout_ctrl.addWidget(self.label_data)
+        self.pushButton_datareq = QPushButton(self.verticalLayoutWidget)
+        self.pushButton_datareq.setObjectName("pushButton_datareq")
+        self.verticalLayout_ctrl.addWidget(self.pushButton_datareq)
+        self.horizontalLayout_add = QHBoxLayout()
+        self.horizontalLayout_add.setObjectName("horizontalLayout_add")
+        self.pushButton_dataadd = QPushButton(self.verticalLayoutWidget)
+        self.pushButton_dataadd.setObjectName("pushButton_dataadd")
+        self.pushButton_dataadd.clicked.connect(self.data_add)
+        self.horizontalLayout_add.addWidget(self.pushButton_dataadd)
+        self.comboBox_plotcolor = QComboBox(self.verticalLayoutWidget)
+        self.comboBox_plotcolor.setObjectName("comboBox_plotcolor")
+        self.horizontalLayout_add.addWidget(self.comboBox_plotcolor)
+        self.verticalLayout_ctrl.addLayout(self.horizontalLayout_add)
+        self.horizontalLayout_autoline = QHBoxLayout()
+        self.horizontalLayout_autoline.setObjectName("horizontalLayout_autoline")
+        self.checkBox_autoline = QCheckBox(self.verticalLayoutWidget)
+        self.checkBox_autoline.setObjectName("checkBox_autoline")
+        self.horizontalLayout_autoline.addWidget(self.checkBox_autoline)
+        self.comboBox_linecolor = QComboBox(self.verticalLayoutWidget)
+        self.comboBox_linecolor.setObjectName("comboBox_linecolor")
+        self.horizontalLayout_autoline.addWidget(self.comboBox_linecolor)
+        self.verticalLayout_ctrl.addLayout(self.horizontalLayout_autoline)
+        self.horizontalLayout_ctrltable.addLayout(self.verticalLayout_ctrl)
 
         #Viewを作成
-        self.tableView = QTableView()
-        self.tableView.clicked.connect(self.viewClicked)
-        self.tableView.setFixedSize(700, 300)
+        self.tableView_main = QTableView()
+        self.tableView_main.clicked.connect(self.viewClicked)
+        self.tableView_main.setFixedSize(700, 300)
         #Viewの罫をブラックにする
-        self.tableView.setStyleSheet("QTableView{gridline-color: black}")
+        self.tableView_main.setStyleSheet("QTableView{gridline-color: black}")
 
-        self.headers = ["▽", "1", "2", "3", "4", "5", "6", "7"]
-        tableData0 = [
-                     [QCheckBox(''), "1", "2", "3", "4", "5", "6", 1],
-                     ]
+        self.headers = ["▽","id", "X", "Y", "Z", "メモ", "点配色", "線配色", "結線先id"]
+        tableData0 = [[QCheckBox(''), 0, 0, 0, 0, "基準点A", "黒", "黒",0]]
 
         #モデルを作成
         self.model = MyTableModel(tableData0, self.headers)
-        self.tableView.setModel(self.model)
+        self.tableView_main.setModel(self.model)
 
         #Insert、remove用の選択行に行の最大値をセット
         self.selectRow = self.model.rowCount(QModelIndex())
 
+        self.tableView_main.setColumnWidth(0,40)
+        self.tableView_main.setColumnWidth(1,40)
+        self.tableView_main.setColumnWidth(2,80)
+        self.tableView_main.setColumnWidth(3,80)
+        self.tableView_main.setColumnWidth(4,80)
+        self.tableView_main.setColumnWidth(5,150)
+        self.tableView_main.setColumnWidth(6,60)
+        self.tableView_main.setColumnWidth(7,60)
+        self.tableView_main.setColumnWidth(8,60)
         #csv用のファイルフィルタをセット
         self.filters = "CSV files (*.csv)"
 
         #ファイル名を初期化
         self.fileName = None
 
-        #ボタン作成
-        self.buttonNew = QPushButton('NEW', self)
-        self.buttonOpen = QPushButton('Open', self)
-        self.buttonSave = QPushButton('Save', self)
-        self.buttonAdd = QPushButton('add', self)
-        self.buttonDell = QPushButton('Dell', self)
+        self.tableView_main.setObjectName("tableView_main")
+        self.horizontalLayout_ctrltable.addWidget(self.tableView_main)
+        self.verticalLayout_all.addLayout(self.horizontalLayout_ctrltable)
 
-        #ボタングループをセット
-        self.group = QButtonGroup()
-        self.group.addButton(self.buttonNew)
-        self.group.addButton(self.buttonOpen)
-        self.group.addButton(self.buttonSave)
-        self.group.addButton(self.buttonAdd)
-        self.group.addButton(self.buttonDell)
-
-        #Signal、Slotを設定
-        self.buttonNew.clicked.connect(self.handleNew)
-        self.buttonOpen.clicked.connect(self.handleOpen)
-        self.buttonSave.clicked.connect(self.handleSave)
-        self.buttonAdd.clicked.connect(self.insertRows)
-        self.buttonDell.clicked.connect(self.removeRows)
-
-        #水平レイアウトを設定
-        layout = QHBoxLayout()
-
-        layout.addWidget(self.buttonNew)
-        layout.addWidget(self.buttonOpen)
-        layout.addWidget(self.buttonSave)
-        layout.addWidget(self.buttonAdd)
-        layout.addWidget(self.buttonDell)
-
-        #Plotボタン
-        self.buttonPlot = QPushButton('PLOT', self)
-        self.buttonPlot.clicked.connect(self.plot)
-
-        #Plotボタン
-        self.graph = gl.GLViewWidget(self)
-        self.graph.opts['distance'] = 10
-        self.graph.show()
+        self.graph_plot3d = gl.GLViewWidget(self)
+        self.graph_plot3d.opts['distance'] = 10
+        self.graph_plot3d.show()
         self.g = gl.GLGridItem()
-        self.graph.addItem(self.g)
+        self.graph_plot3d.addItem(self.g)
 
         self.n=1
         numX, startX, endX = self.n, 1, 0+self.n
@@ -104,18 +135,55 @@ class View (Window):
         self.scttrPlt = gl.GLScatterPlotItem(pos=pos, size=size, color=color, pxMode=False)
         # self.scttrPlt.translate(5,5,0)
         self.scttrPlt.translate(0,0,0)
-        self.graph.addItem(self.scttrPlt)
+        self.graph_plot3d.addItem(self.scttrPlt)
 
-        #垂直レイアウトを設定
-        Vlayout = QVBoxLayout()
-        # Vlayout.addWidget(self.tableView)
-        Vlayout.addWidget(self.buttonPlot)
-        Vlayout.addWidget(self.graph)
-        Vlayout.addWidget(self.tableView)
-        Vlayout.addLayout(layout)
+        self.graph_plot3d.setObjectName("graph_plot3d")
+        self.verticalLayout_all.addWidget(self.graph_plot3d)
 
-        #全体のレイアウトをセット
-        self.setLayout(Vlayout)
+        # _translate = QCoreApplication.translate
+        self.setWindowTitle("Widget")
+        self.pushButton_COM.setText("接続")
+        self.label_status.setText("ステータス：")
+        self.label_data.setText("計測データ表示")
+        self.pushButton_datareq.setText("計測")
+        self.pushButton_dataadd.setText("データ追加")
+        self.checkBox_autoline.setText("自動結線")
+        # self.QMetaObject.connectSlotsByName()
+
+
+        self.menubar = QMenuBar()
+        self.verticalLayout_all.insertWidget(0,self.menubar)
+
+        self.actionFile = self.menubar.addMenu("ファイル")
+        self.actionFile.addAction("新規作成")
+        self.actionFile.addAction("読み込み")
+        self.actionFile.addAction("保存")
+        self.actionFile.addAction("追加")
+        self.actionFile.addSeparator()
+        self.actionFile.addAction("終了")
+        self.menubar.addMenu("ライセンス")
+        self.menubar.setFixedHeight(30)
+
+        self.setLayout(self.verticalLayout_all)
+
+    #Viewとモデルに行追加→選択されている行の下に1行追加
+    def data_add(self, position, rows=1, index=QModelIndex()):
+        print("position: %d"%position)
+        print("rows: %d" % rows)
+        print("rowCount: %d" % self.model.rowCount(QModelIndex()))
+        position = self.selectRow
+        self.model.beginInsertRows(QModelIndex(), position, position + rows - 1)
+        if self.model.rowCount(QModelIndex()) == 1:
+            fid = 0
+        else:
+            fid = self.model.index(self.model.rowCount(QModelIndex())-1, 1, QModelIndex() ).data( Qt.DisplayRole )
+        print(position)
+        print(fid)
+        for row in range(rows):
+            self.model.list.insert(self.model.rowCount(QModelIndex()), [QCheckBox(''), fid+1, 0, 0, 0, "基準点A", "黒", "黒",0])
+
+        self.model.endInsertRows()
+        return True
 
     def plot(self):
         self.n+=1
@@ -183,9 +251,9 @@ class View (Window):
         print ("handleNew")
         self.fileName = ''
 
-        defaultValue =[
-        [QCheckBox(''), "1", "2", "3", "4", "5", "6", 1]
-        ]
+        defaultValue =[[QCheckBox(''), 0, 0, 0, 0, "基準点A", "黒", "黒",0]]
+                # self.headers = ["id", "X", "Y", "Z", "メモ", "点配色", "線配色", "結線先id"]
+                # tableData0 = [[ "0", "0", "0", "0", "基準点A", "黒", "黒",0]]
 
         self.model = None
         self.model = MyTableModel(defaultValue, self.headers)
@@ -194,14 +262,14 @@ class View (Window):
 
     #Viewとモデルに行追加→選択されている行の上に1行挿入します
     def insertRows(self, position, rows=1, index=QModelIndex()):
-        print("position: %d"%position)
-        print("rows: %d" % rows)
-        print("rowCount: %d" % self.model.rowCount(QModelIndex()))
+        # print("position: %d"%position)
+        # print("rows: %d" % rows)
+        # print("rowCount: %d" % self.model.rowCount(QModelIndex()))
 
         position = self.selectRow
         self.model.beginInsertRows(QModelIndex(), position, position + rows - 1)
         for row in range(rows):
-            self.model.list.insert(position, [QCheckBox(''), "1", "2", "3", "4", "5", "6", 1])
+            self.model.list.insert(position, [QCheckBox(''), 0, 0, 0, 0, "基準点A", "黒", "黒",0])
 
         self.model.endInsertRows()
         return True
